@@ -1,0 +1,10 @@
+**/.idea
+**/.vscode
+**/build
+**/cmake-build-debug
+**/*.so
+**/pro
+**/origin
+**/NNCF_INT8_openvino_model
+tools/imgs
+**/__pycache__
