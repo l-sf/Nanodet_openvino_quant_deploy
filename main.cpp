@@ -1,3 +1,7 @@
+//
+// Created by lsf on 2023/5/11.
+//
+
 #include "Nanodet.h"
 
 
@@ -68,31 +72,10 @@ int video_demo(const std::shared_ptr<NanoDet>& detector, const char* path)
     }
 }
 
-int benchmark(const std::shared_ptr<NanoDet>& detector)
+void benchmark(const std::shared_ptr<NanoDet>& detector)
 {
     int loop_num = 1000;
-    int warm_up = 50;
-    cv::Mat image(320, 320, CV_8UC3, cv::Scalar(1, 1, 1));
-    std::vector<Box> boxes;
-
-    // warmup
-    for (int i = 0; i < warm_up; i++)
-    {
-        detector->detect(image, boxes);
-        boxes.clear();
-    }
-
-    auto start = std::chrono::steady_clock::now();
-    for (int i = 0; i < loop_num; i++)
-    {
-        detector->detect(image, boxes);
-        boxes.clear();
-    }
-    auto end = std::chrono::steady_clock::now();
-    std::chrono::duration<double> elapsed = end - start;
-    double time = 1000 * elapsed.count();
-    printf("Average detect time = %.2f ms\n", time / loop_num);
-    return 0;
+    detector->benchmark(loop_num);
 }
 
 

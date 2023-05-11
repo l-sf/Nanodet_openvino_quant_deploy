@@ -1,3 +1,8 @@
+//
+// Created by lsf on 2023/5/11.
+//
+
+
 #include "Nanodet.h"
 
 float fast_exp(float x)
@@ -78,12 +83,12 @@ void NanoDet::detect(cv::Mat &image, std::vector<Box>& boxes_res)
     // 1. 图像预处理
     preprocess(image);
     // 2. 推理
-    auto start = std::chrono::steady_clock::now();
+//    auto start = std::chrono::steady_clock::now();
     infer();
-    auto end = std::chrono::steady_clock::now();
-    std::chrono::duration<double> elapsed = end - start;
-    double time = 1000 * elapsed.count();
-    printf("Infer time = %.2f ms\n", time);
+//    auto end = std::chrono::steady_clock::now();
+//    std::chrono::duration<double> elapsed = end - start;
+//    double time = 1000 * elapsed.count();
+//    printf("Infer time = %.2f ms\n", time);
     // 3. 解码输出得到框
     decode_infer();
     // 4. 非极大抑制
@@ -264,6 +269,25 @@ void NanoDet::generate_grid_center_priors()
             }
         }
     }
+}
+
+void NanoDet::benchmark(int loop_num) {
+    int warm_up = 50;
+    input_image_ = cv::Mat(320, 320, CV_8UC3, cv::Scalar(1, 1, 1));
+    // warmup
+    for (int i = 0; i < warm_up; i++)
+    {
+        infer();
+    }
+    auto start = std::chrono::steady_clock::now();
+    for (int i = 0; i < loop_num; i++)
+    {
+        infer();
+    }
+    auto end = std::chrono::steady_clock::now();
+    std::chrono::duration<double> elapsed = end - start;
+    double time = 1000 * elapsed.count();
+    printf("Average infer time = %.2f ms\n", time / loop_num);
 }
 
 

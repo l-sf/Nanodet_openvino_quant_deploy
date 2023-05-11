@@ -1,155 +1,145 @@
-# NanoDet OpenVINO Demo
+# Nanodet (Quant and Deploy based on Openvino)
 
-This fold provides NanoDet inference code using
-[Intel's OpenVINO Toolkit](https://software.intel.com/content/www/us/en/develop/tools/openvino-toolkit.html). Most of the implements in this fold are same as *demo_ncnn*.
+官方代码仓库：
 
-## Install OpenVINO Toolkit
+https://github.com/RangiLyu/nanodet
 
-Go to [OpenVINO HomePage](https://software.intel.com/content/www/us/en/develop/tools/openvino-toolkit.html)
 
-Download a suitable version and install.
 
-Follow the official Get Started Guides: https://docs.openvinotoolkit.org/latest/get_started_guides.html
+## 介绍
 
-## Set the Environment Variables
+本仓库基于 Intel OpenVINO 的 NNCF 工具将 nanodet-plus-m_320 模型量化至 int8 精度，推理速度更快！！！
 
-### Windows:
+在 OpenVINO 推理框架下部署 Nanodet 检测算法，并重写预处理Warp Affine和后处理NMS部分，具有超高性能！！！
 
-Run this command in cmd. (Every time before using OpenVINO)
-```cmd
-<INSTSLL_DIR>\openvino_2021\bin\setupvars.bat
+让你在 Intel CPU 平台上的检测速度起飞！！！
+
+
+
+**优势**：方便部署，高性能。
+
+
+
+## 推理速度
+
+| Intel CPU | (fp32) infer avg time | (int8) infer avg time |
+| :-------: | :-------------------: | :-------------------: |
+| i7-12700K |        3.12ms         |        2.41ms         |
+| i7-10710U |         TODO          |         TODO          |
+| i7-7700HQ |         TODO          |         TODO          |
+
+**注**：实际程序运行速度与图像中目标数量有关，目标越多，后处理解码和NMS耗时则越多。
+
+
+
+## 安装 OpenVINO Toolkit
+
+参考官网安装教程 [Get Started Guides](https://docs.openvino.ai/latest/openvino_docs_install_guides_installing_openvino_apt.html)
+
+```bash
+wget https://apt.repos.intel.com/intel-gpg-keys/GPG-PUB-KEY-INTEL-SW-PRODUCTS.PUB
+sudo apt-key add GPG-PUB-KEY-INTEL-SW-PRODUCTS.PUB
+echo "deb https://apt.repos.intel.com/openvino/2022 focal main" | sudo tee /etc/apt/sources.list.d/intel-openvino-2022.list
+sudo apt update
+apt-cache search openvino
+sudo apt install openvino
+apt list --installed | grep openvino
+```
+
+python 安装
+
+```bash
+pip install openvino
 ```
 
 
-Or set the system environment variables once for all:
 
-Name                  |Value
-:--------------------:|:--------:
-INTEL_OPENVINO_DIR | <INSTSLL_DIR>\openvino_2021
-INTEL_CVSDK_DIR | %INTEL_OPENVINO_DIR%
-InferenceEngine_DIR | %INTEL_OPENVINO_DIR%\deployment_tools\inference_engine\share
-HDDL_INSTALL_DIR | %INTEL_OPENVINO_DIR%\deployment_tools\inference_engine\external\hddl
-ngraph_DIR | %INTEL_OPENVINO_DIR%\deployment_tools\ngraph\cmake
-
-And add this to ```Path```
-```
-%INTEL_OPENVINO_DIR%\deployment_tools\inference_engine\bin\intel64\Debug;%INTEL_OPENVINO_DIR%\deployment_tools\inference_engine\bin\intel64\Release;%HDDL_INSTALL_DIR%\bin;%INTEL_OPENVINO_DIR%\deployment_tools\inference_engine\external\tbb\bin;%INTEL_OPENVINO_DIR%\deployment_tools\ngraph\lib
-```
-
-### Linux
-
-Run this command in shell. (Every time before using OpenVINO)
-
-```shell
-source /opt/intel/openvino_2021/bin/setupvars.sh
-```
-
-Or edit .bashrc
-
-```shell
-vi ~/.bashrc
-```
-
-Add this line to the end of the file
-
-```shell
-source /opt/intel/openvino_2021/bin/setupvars.sh
-```
-
-## Convert model
+## 模型导出与修改
 
 1. Export ONNX model
 
-   ```shell
-   python ./tools/export_onnx.py --cfg_path ${CONFIG_PATH} --model_path ${PYTORCH_MODEL_PATH}
+   ```bash
+   cd nanodet
+   python tools/export_onnx.py --cfg_path config/nanodet-plus-m_320.yml --model_path weights/nanodet-plus-m_320.pth
    ```
 
 2. Convert to OpenVINO
 
-   ``` shell
-   cd <INSTSLL_DIR>/openvino_2021/deployment_tools/model_optimizer
+   ```bash
+   mo --framework onnx --input_model nanodet.onnx
    ```
 
-   Install requirements for convert tool
+3. Add Preprocess
 
-   ```shell
-   sudo ./install_prerequisites/install_prerequisites_onnx.sh
+   ```bash
+   cd tools
+   python add_preprocess
+   # 注意修改其中的模型路径
    ```
 
-   Then convert model. Notice: mean_values and scale_values should be the same with your training settings in YAML config file.
-   ```shell
-   python3 mo.py --input_model ${ONNX_MODEL} --mean_values [103.53,116.28,123.675] --scale_values [57.375,57.12,58.395] --output output --data_type FP32 --output_dir ${OUTPUT_DIR}
+
+
+## 模型量化
+
+参考官网量化教程 [Post-training Quantization with NNCF](https://docs.openvino.ai/latest/nncf_ptq_introduction.html)
+
+1. 准备300张标定数据集，放入 `tools/imgs` 路径下
+
+2. 安装NNCF
+
+   ```bash
+   pip install nncf
    ```
 
-## Build
+2. 执行量化
 
-### Windows
+   ```bash
+   cd tools
+   python quant.py
+   # 注意修改其中的模型路径
+   ```
 
-```cmd
-<OPENVINO_INSTSLL_DIR>\openvino_2021\bin\setupvars.bat
-mkdir -p build
-cd build
-cmake ..
-msbuild nanodet_demo.vcxproj /p:configuration=release /p:platform=x64
+
+
+## C++ demo Build and Run
+
+#### build
+
+```bash
+cd /your_path/Nanodet_openvino_quant_deploy
+mkdir build && cd build
+cmake .. && make -j
 ```
 
-### Linux
-```shell
-source /opt/intel/openvino_2021/bin/setupvars.sh
-mkdir build
-cd build
-cmake ..
-make
+#### run
+
+```bash
+cd workspace
+```
+
+**图片输入:**
+
+```bash
+./pro 0 "imgs/car.jpg"
+```
+
+**摄像头输入:**
+
+```bash
+./pro 1 0
+```
+
+**视频文件输入:** 
+
+```bash
+./pro 2 "videos/palace.mp4"
+```
+
+**benchmark** 
+
+```bash
+./pro 3 0
 ```
 
 
-## Run demo
 
-You can convert the model to openvino or use the [converted model](https://drive.google.com/file/d/1dAwIA2pMkSetPEcvB0dvmLaOAK-9h-Lm/view?usp=sharing)
-
-First, move nanodet openvino model files to the `build` folder and rename the files to `nanodet.xml`, `nanodet.mapping`, `nanodet.bin`.
-
-Then run these commands:
-
-### Webcam
-
-```shell
-./nanodet_demo 0 0
-```
-
-### Inference images
-
-```shell
-./nanodet_demo 1 ${IMAGE_FOLDER}/*.jpg
-```
-
-### Inference video
-
-```shell
-./nanodet_demo 2 ${VIDEO_PATH}
-```
-
-### Benchmark
-
-```shell
-./nanodet_demo 3 0
-```
-
-Model               |Resolution|COCO mAP  | CPU Latency (i7-8700) |
-:------------------:|:--------:|:--------:|:---------------------:|
-NanoDet-Plus-m      | 320*320  |   27.0   | 5.25ms / 190FPS       |
-NanoDet-Plus-m      | 416*416  |   30.4   | 8.32ms / 120FPS       |
-NanoDet-Plus-m-1.5x | 320*320  |   29.9   | 7.21ms / 139FPS       |
-NanoDet-Plus-m-1.5x | 416*416  |   34.1   | 11.50ms / 87FPS       |
-
-## Custom model
-
-If you want to use custom model, please make sure the hyperparameters
-in `nanodet_openvino.h` are the same with your training config file.
-
-```cpp
-int input_size[2] = {416, 416}; // input height and width
-int num_class = 80; // number of classes. 80 for COCO
-int reg_max = 7; // `reg_max` set in the training config. Default: 7.
-std::vector<int> strides = { 8, 16, 32, 64 }; // strides of the multi-level feature.
-```

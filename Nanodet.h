@@ -47,6 +47,8 @@ public:
 
     void draw(cv::Mat& image, std::vector<Box>& boxes_res);
 
+    void benchmark(int loop_num = 1000);
+
 private:
     std::string input_name_ = "image";
     std::string output_name_ = "output";
