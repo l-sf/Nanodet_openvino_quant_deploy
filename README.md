@@ -22,6 +22,31 @@ https://github.com/RangiLyu/nanodet
 
 ## 推理速度
 
+测试平台：i7-12700K
+
+测试代码如下：
+
+```c++
+void NanoDet::benchmark(int loop_num) {
+    int warm_up = 50;
+    input_image_ = cv::Mat(input_height_, input_width_, CV_8UC3, cv::Scalar(1, 1, 1));
+    // warmup
+    for (int i = 0; i < warm_up; i++)
+    {
+        infer();
+    }
+    auto start = std::chrono::steady_clock::now();
+    for (int i = 0; i < loop_num; i++)
+    {
+        infer();
+    }
+    auto end = std::chrono::steady_clock::now();
+    std::chrono::duration<double> elapsed = end - start;
+    double time = 1000 * elapsed.count();
+    printf("Average infer time = %.2f ms\n", time / loop_num);
+}
+```
+
 |          Model          | (fp32) infer avg latency | (int8) infer avg latency |
 | :---------------------: | :----------------------: | :----------------------: |
 |   nanodet-plus-m_320    |         3.12 ms          |         2.41 ms          |
