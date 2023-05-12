@@ -39,7 +39,8 @@ struct CenterPrior
 class NanoDet
 {
 public:
-    explicit NanoDet(const std::string &model_path, float score_threshold = 0.4, float nms_threshold = 0.5);
+    explicit NanoDet(const std::string &model_path, int width, int height,
+                     float score_threshold = 0.4, float nms_threshold = 0.5);
 
     ~NanoDet() = default;
 

@@ -8,9 +8,9 @@ https://github.com/RangiLyu/nanodet
 
 ## 介绍
 
-本仓库基于 Intel OpenVINO 的 NNCF 工具将 nanodet-plus-m_320 模型量化至 int8 精度，推理速度更快！！！
+本仓库基于 NNCF 工具将 nanodet-plus-m_320 模型量化 (PTQ) 至 int8 精度，推理速度更快！！！
 
-在 OpenVINO 推理框架下部署 Nanodet 检测算法，并重写预处理Warp Affine和后处理NMS部分，具有超高性能！！！
+在 OpenVINO 推理框架下部署 Nanodet 检测算法，并重写预处理 Warp Affine 和 后处理 NMS 部分，具有超高性能！！！
 
 让你在 Intel CPU 平台上的检测速度起飞！！！
 
@@ -22,11 +22,12 @@ https://github.com/RangiLyu/nanodet
 
 ## 推理速度
 
-| Intel CPU | (fp32) infer avg time | (int8) infer avg time |
-| :-------: | :-------------------: | :-------------------: |
-| i7-12700K |        3.12ms         |        2.41ms         |
-| i7-10710U |         TODO          |         TODO          |
-| i7-7700HQ |         TODO          |         TODO          |
+|          Model          | (fp32) infer avg latency | (int8) infer avg latency |
+| :---------------------: | :----------------------: | :----------------------: |
+|   nanodet-plus-m_320    |         3.12 ms          |         2.41 ms          |
+|   nanodet-plus-m_416    |         4.80 ms          |         3.58 ms          |
+| nanodet-plus-m-1.5x_320 |         4.70 ms          |         3.41 ms          |
+| nanodet-plus-m-1.5x_416 |         7.59 ms          |         5.18 ms          |
 
 **注**：实际程序运行速度与图像中目标数量有关，目标越多，后处理解码和NMS耗时则越多。
 
@@ -91,7 +92,7 @@ pip install openvino
    pip install nncf
    ```
 
-2. 执行量化
+3. 执行量化
 
    ```bash
    cd tools

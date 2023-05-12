@@ -6,8 +6,8 @@ from openvino.preprocess import PrePostProcessor, ColorFormat
 from openvino.runtime import Core, Layout, Type, serialize
 
 
-# model_path = "../workspace/origin/nanodet_320.xml"
-model_path = "../workspace/origin/nanodet_int8.xml"
+model_path = "../workspace/origin/nanodet-1.5x-320.xml"
+# model_path = "../workspace/NNCF_INT8_openvino_model/nanodet-1.5x-320-int8.xml"
 
 
 # Step1: 创建OpenVINO运行时
@@ -34,5 +34,5 @@ model = ppp.build()
 
 
 # Step4: 使用预处理保存模型
-serialize(model, 'nanodet_int8.xml', 'nanodet_int8.bin')
+serialize(model, 'nanodet-1.5x-320-fp32.xml', 'nanodet-1.5x-320-fp32.bin')
 

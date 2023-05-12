@@ -58,7 +58,8 @@ static std::tuple<uint8_t, uint8_t, uint8_t> random_color(int id){
 }
 
 
-NanoDet::NanoDet(const std::string &model_path, float score_threshold, float nms_threshold)
+NanoDet::NanoDet(const std::string &model_path, int width, int height,
+                 float score_threshold, float nms_threshold)
 {
     // 1.创建OpenVINO Runtime Core对象
     ov::Core core;
@@ -68,11 +69,13 @@ NanoDet::NanoDet(const std::string &model_path, float score_threshold, float nms
     infer_request_ = compile_model.create_infer_request();
 
     // 4. 初始化一些变量
-    input_image_ = cv::Mat(input_height_, input_width_, CV_8UC3);
+    input_width_ = width;
+    input_height_ = height;
     score_threshold_ = score_threshold;
     nms_threshold_ = nms_threshold;
     Boxes_.reserve(1000);
     center_priors_.reserve(2150);
+    input_image_ = cv::Mat(input_height_, input_width_, CV_8UC3);
     // 生成锚点
     generate_grid_center_priors();
 }
@@ -273,7 +276,7 @@ void NanoDet::generate_grid_center_priors()
 
 void NanoDet::benchmark(int loop_num) {
     int warm_up = 50;
-    input_image_ = cv::Mat(320, 320, CV_8UC3, cv::Scalar(1, 1, 1));
+    input_image_ = cv::Mat(input_height_, input_width_, CV_8UC3, cv::Scalar(1, 1, 1));
     // warmup
     for (int i = 0; i < warm_up; i++)
     {

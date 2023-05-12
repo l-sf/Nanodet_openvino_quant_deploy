@@ -9,7 +9,7 @@ import os
 from PIL import Image
 from openvino.runtime import Core, serialize
 
-MODEL_PATH = '../workspace/origin/nanodet_fp32.xml'
+MODEL_PATH = '../workspace/origin/nanodet-1.5x-320.xml'
 CALIBRATION_PATH = 'imgs'
 BATCHSIZE = 1
 
@@ -41,5 +41,5 @@ ov_model = core.read_model(MODEL_PATH)
 quantized_model = nncf.quantize(
     ov_model, nncf_calibration_dataset, preset=preset, subset_size=subset_size
 )
-int8_path = "../workspace/NNCF_INT8_openvino_model/nanodet_int8.xml"
+int8_path = "../workspace/NNCF_INT8_openvino_model/nanodet-1.5x-320-int8.xml"
 serialize(quantized_model, int8_path)
