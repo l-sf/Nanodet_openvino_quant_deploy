@@ -10,7 +10,7 @@ https://github.com/RangiLyu/nanodet
 
 本仓库基于 NNCF 工具将模型量化 (PTQ) 至 int8 精度，推理速度更快！！！
 
-在 OpenVINO 推理框架下部署 Nanodet 检测算法，并重写预处理 Warp Affine 和 后处理 NMS 部分，具有超高性能！！！
+在 OpenVINO 推理框架下部署 Nanodet 检测算法，并重写预处理和后处理部分，具有超高性能！！！
 
 让你在 Intel CPU 平台上的检测速度起飞！！！
 
