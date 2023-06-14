@@ -4,7 +4,8 @@
 **/cmake-build-debug
 **/*.so
 **/pro
-**/origin
-**/NNCF_INT8_openvino_model
-tools/imgs
+**/origin_models
+**/nncf_int8_openvino_models
+**/ppq_int8_models
+quant/imgs
 **/__pycache__

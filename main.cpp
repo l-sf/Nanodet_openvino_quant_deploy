@@ -88,8 +88,9 @@ int main(int argc, char** argv)
     }
 
     std::cout << "Start init model." << std::endl;
-    auto detector = std::make_shared<NanoDet>("nanodet-1.5x-320-int8.xml",
-                                              320, 320, 0.4, 0.5);
+    // nanodet-full-1.5x-320-int8-ppq.xml  nanodet-1.5x-320-int8.xml
+    auto detector = std::make_shared<NanoDet>("nanodet-full-1.5x-416-int8-ppq.xml",
+                                              416, 416, 0.4, 0.5);
     std::cout << "Init model success." << std::endl;
 
     int mode = atoi(argv[1]);

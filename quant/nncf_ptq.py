@@ -10,13 +10,15 @@ from PIL import Image
 from openvino.runtime import Core, serialize
 
 MODEL_PATH = '../workspace/origin/nanodet-1.5x-320.xml'
+INT8_PATH = "../workspace/NNCF_INT8_openvino_model/nanodet-1.5x-320-int8.xml"
 CALIBRATION_PATH = 'imgs'
 BATCHSIZE = 1
+SUBSET_SIZE = 512
 
 imgs = []
 trans = transforms.Compose([
     transforms.Resize([320, 320]),  # [h,w]
-    transforms.ToTensor(),
+    # transforms.ToTensor()
 ])
 for file in os.listdir(path=CALIBRATION_PATH):
     path = os.path.join(CALIBRATION_PATH, file)
@@ -27,19 +29,19 @@ for file in os.listdir(path=CALIBRATION_PATH):
 dataloader = DataLoader(dataset=imgs, batch_size=BATCHSIZE)
 
 
-def transform_fn(data_item):
-    return {'image': data_item.numpy()}
+# def transform_fn(data_item):
+#     return {'image': data_item.numpy()}
 
 
-nncf_calibration_dataset = nncf.Dataset(dataloader, transform_fn)
+nncf_calibration_dataset = nncf.Dataset(data_source=dataloader)
 
-subset_size = 300
+
 preset = nncf.QuantizationPreset.MIXED
 
 model = core = Core()
 ov_model = core.read_model(MODEL_PATH)
 quantized_model = nncf.quantize(
-    ov_model, nncf_calibration_dataset, preset=preset, subset_size=subset_size
+    ov_model, nncf_calibration_dataset, preset=preset, subset_size=SUBSET_SIZE
 )
-int8_path = "../workspace/NNCF_INT8_openvino_model/nanodet-1.5x-320-int8.xml"
-serialize(quantized_model, int8_path)
+
+serialize(quantized_model, INT8_PATH)

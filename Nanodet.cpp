@@ -86,12 +86,7 @@ void NanoDet::detect(cv::Mat &image, std::vector<Box>& boxes_res)
     // 1. 图像预处理
     preprocess(image);
     // 2. 推理
-//    auto start = std::chrono::steady_clock::now();
     infer();
-//    auto end = std::chrono::steady_clock::now();
-//    std::chrono::duration<double> elapsed = end - start;
-//    double time = 1000 * elapsed.count();
-//    printf("Infer time = %.2f ms\n", time);
     // 3. 解码输出得到框
     decode_infer();
     // 4. 非极大抑制
